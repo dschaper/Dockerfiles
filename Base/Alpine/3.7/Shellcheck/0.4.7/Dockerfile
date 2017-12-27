@@ -1,4 +1,4 @@
-FROM djschaper/minideb-git:stretch as builder
+FROM bitnami/minideb:stretch as builder
 
 # Set environment for building binary
 ENV HOME=/opt/shellcheck
@@ -11,12 +11,13 @@ RUN install_packages \
 WORKDIR /opt/shellcheck
 
 # Copy the shell check code to be built https://github.com/koalaman/shellcheck
-RUN git clone --depth=1 -b master https://github.com/koalaman/shellcheck .
+ADD shellcheck .
 
 RUN cabal update && \
     cabal install --dependencies-only && \
-    cabal build Paths_ShellCheck && \
-    ghc -optl-static -optl-pthread -idist/build/autogen --make shellcheck
+    cabal build Paths_ShellCheck
+
+RUN ghc -optl-static -optl-pthread -idist/build/autogen --make shellcheck
 
 FROM alpine:3.7 as runner
 
