@@ -11,16 +11,13 @@ RUN install_packages \
 WORKDIR /opt/shellcheck
 
 # Copy the shell check code to be built https://github.com/koalaman/shellcheck
-ADD shellcheck .
+ADD source .
 
 RUN cabal update && \
     cabal install --dependencies-only && \
-    cabal build Paths_ShellCheck
+    cabal build Paths_ShellCheck && \
+    ghc -optl-static -optl-pthread -idist/build/autogen --make shellcheck && \
+    mv shellcheck /bin && \
+    rm -rf /opt/shellcheck
 
-RUN ghc -optl-static -optl-pthread -idist/build/autogen --make shellcheck
-
-FROM alpine:3.7 as runner
-
-COPY --from=builder /opt/shellcheck/shellcheck /bin/
-
-CMD ["/bin/shellcheck"]
+WORKDIR /bin
