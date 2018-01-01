@@ -1,8 +1,0 @@
-version: '2.3'
-
-services:
-  shellcheck:
-    build:
-      context: .
-    image: djschaper/shellcheck:0.4.7-build
-    cpus: ${NPROC:-1}
